@@ -2,6 +2,8 @@ package com.example.service.items;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,23 +29,40 @@ public class ItemService {
                 item = new Item();
             item.setId(id);
             item.setDate(updateDate);
+            item.setType(itemImport.getType());
             item.setUrl(itemImport.getUrl());
             item.setParentId(itemImport.getParentId());
-            item.setType(itemImport.getType());
             item.setSize(itemImport.getSize());
-            items.add(item);
+            if (!items.contains(item))
+                items.add(item);
+            else
+                throw new RuntimeException("Validation Failed");
         }
         itemRepository.saveAll(items);
     }
 
-    public void deleteById(String id) {
-        Item toBeDeleted = itemRepository.getReferenceById(id);
-        List<Item> children = toBeDeleted.getChildren();
-        itemRepository.deleteAll(children);
-        itemRepository.deleteById(id);
+    public void deleteById(String id, String date) {
+        try {
+            LocalDateTime.parse(date);
+        }
+        catch (DateTimeParseException e) {
+            throw new RuntimeException("Validation Failed");
+        }
+
+        if (itemRepository.existsById(id)) {
+            Item toBeDeleted = itemRepository.getReferenceById(id);
+            List<Item> children = toBeDeleted.getChildren();
+            itemRepository.deleteAll(children);
+            itemRepository.deleteById(id);
+        }
+        else
+            throw new RuntimeException("Item not found");
     }
 
     public Item getInfoById(String id) {
-        return itemRepository.getReferenceById(id);
+        if (itemRepository.existsById(id))
+            return itemRepository.getReferenceById(id);
+        else
+            throw new RuntimeException("Item not found");
     }
 }
