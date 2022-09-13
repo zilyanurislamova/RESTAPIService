@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @ControllerAdvice
-public class RestApiResponseHandler implements ResponseBodyAdvice<Object> {
+public class ResponseHandler implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler
     public ResponseEntity<Object> handleException(Exception e) {
