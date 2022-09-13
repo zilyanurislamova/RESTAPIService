@@ -2,8 +2,6 @@ package com.example.service.items;
 
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 public class ItemController {
     private final ItemService itemService;
@@ -13,8 +11,8 @@ public class ItemController {
     }
 
     @PostMapping(path = "imports")
-    public void addOrUpdate(@RequestBody List<Item> items) {
-        itemService.addOrUpdate(items);
+    public void importItems(@RequestBody ItemImportRequest itemImportRequest) {
+        itemService.importItems(itemImportRequest);
     }
 
     @DeleteMapping(path = "delete/{id}")

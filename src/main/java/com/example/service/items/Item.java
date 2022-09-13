@@ -84,4 +84,32 @@ public class Item {
     public List<Item> getChildren() {
         return children;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public void setType(String type) {
+        if (this.type == null)
+            this.type = type;
+        else if (!this.type.equals(type)) {
+            throw new RuntimeException("Validation Failed");
+        }
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 }
