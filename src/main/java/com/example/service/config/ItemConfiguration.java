@@ -1,5 +1,8 @@
-package com.example.service.items;
+package com.example.service.config;
 
+import com.example.service.items.Item;
+import com.example.service.items.ItemRepository;
+import com.example.service.items.Type;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
