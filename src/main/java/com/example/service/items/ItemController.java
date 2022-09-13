@@ -15,9 +15,9 @@ public class ItemController {
         itemService.importItems(itemImportRequest);
     }
 
-    @DeleteMapping(path = "delete/{id}")
-    public void deleteById(@PathVariable String id) {
-        itemService.deleteById(id);
+    @DeleteMapping(path = "delete/{id}", params = "date")
+    public void deleteById(@PathVariable String id, @RequestParam("date") String date) {
+        itemService.deleteById(id, date);
     }
 
     @GetMapping(path = "nodes/{id}")

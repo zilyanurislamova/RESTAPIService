@@ -1,18 +1,29 @@
 package com.example.service.items;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class Item {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Item{
+
+    @Override
+    public boolean equals(Object object) {
+        Item other;
+        if (object instanceof Item)
+            other = (Item)object;
+        else
+            return false;
+        return this.id.equals(other.id);
+    }
 
     @Id
     @Column(nullable = false)
     private String id;
 
-    @Column
+    @Column()
     private String url;
 
     @Column(nullable = false)
@@ -27,8 +38,7 @@ public class Item {
     @Column
     private int size;
 
-    @OneToMany(mappedBy = "parentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "parentId")
     private List<Item> children;
 
     public Item() {
@@ -111,5 +121,9 @@ public class Item {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public void setChildren(List<Item> children) {
+        this.children = children;
     }
 }
