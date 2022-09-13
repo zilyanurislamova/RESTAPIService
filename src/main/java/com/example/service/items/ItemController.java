@@ -10,18 +10,18 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @PostMapping("/imports")
-    public void addOrUpdate() {
-
+    @PostMapping(path = "imports")
+    public void importItems(@RequestBody ItemImportRequest itemImportRequest) {
+        itemService.importItems(itemImportRequest);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void delete() {
-
+    @DeleteMapping(path = "delete/{id}")
+    public void deleteById(@PathVariable String id) {
+        itemService.deleteById(id);
     }
 
-    @GetMapping("/nodes/{id}")
-    public void get() {
-
+    @GetMapping(path = "nodes/{id}")
+    public Item getInfoById(@PathVariable String id) {
+        return itemService.getInfoById(id);
     }
 }
