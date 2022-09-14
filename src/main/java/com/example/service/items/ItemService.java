@@ -1,6 +1,8 @@
 package com.example.service.items;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +39,7 @@ public class ItemService {
             if (!items.contains(item))
                 items.add(item);
             else
-                throw new RuntimeException("Validation Failed");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         itemRepository.saveAll(items);
     }
@@ -47,7 +49,7 @@ public class ItemService {
             LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME);
         }
         catch (DateTimeParseException e) {
-            throw new RuntimeException("Validation Failed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         if (itemRepository.existsById(id)) {
@@ -57,13 +59,13 @@ public class ItemService {
             itemRepository.deleteById(id);
         }
         else
-            throw new RuntimeException("Item not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     public Item getInfoById(String id) {
         if (itemRepository.existsById(id))
             return itemRepository.getReferenceById(id);
         else
-            throw new RuntimeException("Item not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }
