@@ -41,6 +41,10 @@ public class ItemService {
                 item.setId(id);
             }
 
+            // в одном запросе не может быть двух элементов с одинаковым id
+            if (items.contains(item))
+                throw BAD_REQUEST;
+
             // при обновлении параметров элемента обязательно обновляется поле date в соответствии с временем обновления
             // дата обрабатывается согласно ISO 8601 (такой придерживается OpenAPI).
             // Если дата не удовлетворяет данному формату, ответом будет код 400
@@ -85,52 +89,33 @@ public class ItemService {
             Integer size = itemImport.getSize();
             if ((item.isFile() && size > 0) || (item.isFolder() && size == null)){
                 Integer prevSize = item.getSize(); // старый размер
-                if (size != null)
-                    item.setSize(size);
-                if (parentId != null && size != null) { // импорт файла
-                    Item parent = itemRepository.getReferenceById(parentId);
-                    Integer parentSize = parent.getSize();
-                    if (parentId.equals(prevParentId)) // если родитель НЕ сменился
-                        parent.setSize(parentSize + size - prevSize); // плюс новый размер минус старый
-                    else if (prevParentId == null) { // если родителя не было
-                        if (parentSize == null) { // если это первый файл в папке
-                            parent.setSize(size);
-                        }else
-                            parent.setSize(parentSize + size);
-                    }
-                    else { // если родитель сменился
-                        Item prevParent = itemRepository.getReferenceById(prevParentId);
-                        Integer prevParentSize = prevParent.getSize();
-                        if (parentSize == null) { // если это первый файл в папке
-                            parent.setSize(size);
-                        }else
-                            parent.setSize(parentSize + size); // к новому плюсуем новый размер
-                        prevParent.setSize(prevParentSize - prevSize); // от старого отнимаем старый размер
-                        itemRepository.save(prevParent);
-                    }
+                if (prevSize == null) // если это новая папка/файл
+                    prevSize = 0;
+                if (size == null) // для папки - старый размер (для файла - новый)
+                    size = prevSize;
+                item.setSize(size);
+                Item parent; // новый родитель
+                Integer parentSize;
+                Item prevParent; // старый родитель
+                Integer prevParentSize;
+                while (parentId != null) {
+                    parent = itemRepository.getReferenceById(parentId);
+                    parentSize = parent.getSize();
+                    parent.setSize(parentSize + size);
+                    parentId = parent.getParentId();
                     itemRepository.save(parent);
                 }
-                else if (parentId == null && prevParentId != null) { // если родителя больше нет, но он был
-                    Item prevParent = itemRepository.getReferenceById(prevParentId);
-                    Integer prevParentSize = prevParent.getSize();
-                    prevParent.setSize(prevParentSize - prevSize); // отнимаем старый размер у старого родителя
+                while (prevParentId != null) {
+                    prevParent = itemRepository.getReferenceById(prevParentId);
+                    prevParentSize = prevParent.getSize();
+                    prevParent.setSize(prevParentSize - prevSize);
+                    prevParentId = prevParent.getParentId();
                     itemRepository.save(prevParent);
-                } else if (parentId != null) { // импорт папки в папку
-                    Item parent = itemRepository.getReferenceById(parentId);
-                    Integer parentSize = parent.getSize();
-                    if (parentSize == null) { // если это первая папка в папке
-                        parent.setSize(prevSize);
-                    }else
-                        parent.setSize(parentSize + prevSize);
                 }
-            }  else
+            } else
                 throw BAD_REQUEST;
 
-            // в одном запросе не может быть двух элементов с одинаковым id
-            if (!items.contains(item))
-                items.add(item);
-            else
-                throw BAD_REQUEST;
+            items.add(item);
         }
         itemRepository.saveAll(items);
     }

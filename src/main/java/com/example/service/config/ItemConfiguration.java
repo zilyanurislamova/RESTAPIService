@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Configuration
 public class ItemConfiguration {
@@ -20,7 +19,7 @@ public class ItemConfiguration {
             itemRepository.saveAll(List.of(
                     new Item("folder_1", LocalDateTime.now().toString(), Type.FOLDER, 54),
                     new Item("file_1", LocalDateTime.now().toString(), "folder_1", Type.FILE, 54),
-                    new Item("folder_2", LocalDateTime.now().toString(), Type.FOLDER)
+                    new Item("folder_2", LocalDateTime.now().toString(), Type.FOLDER, 0)
             ));
         };
     }
