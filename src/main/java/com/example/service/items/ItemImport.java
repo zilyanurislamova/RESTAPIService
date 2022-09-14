@@ -10,9 +10,9 @@ public class ItemImport {
 
     private String type;
 
-    private int size;
+    private Integer size;
 
-    public ItemImport(String id, String url, String parentId, Type type, int size) {
+    public ItemImport(String id, String url, String parentId, Type type, Integer size) {
         this.id = id;
         this.url = url;
         this.parentId = parentId;
@@ -36,7 +36,7 @@ public class ItemImport {
         return type;
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 }
