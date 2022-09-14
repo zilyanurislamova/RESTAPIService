@@ -43,11 +43,26 @@ public class Item{
         this.type = type.getValue();
     }
 
+    public Item(String id, String date, Type type, Integer size) {
+        this.id = id;
+        this.date = date;
+        this.type = type.getValue();
+        this.size = size;
+    }
+
     public Item(String id, String date, String parentId, Type type) {
         this.id = id;
         this.date = date;
         this.parentId = parentId;
         this.type = type.getValue();
+    }
+
+    public Item(String id, String date, String parentId, Type type, Integer size) {
+        this.id = id;
+        this.date = date;
+        this.parentId = parentId;
+        this.type = type.getValue();
+        this.size = size;
     }
 
     @Override
@@ -80,7 +95,7 @@ public class Item{
         return type;
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 

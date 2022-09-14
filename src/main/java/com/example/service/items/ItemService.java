@@ -72,6 +72,7 @@ public class ItemService {
             // принадлежность к папке определяется полем parentId
             // элементы могут не иметь родителя (при обновлении parentId на null элемент остается без родителя)
             String parentId = itemImport.getParentId();
+            String prevParentId = item.getParentId();
             if (parentId == null || itemRepository.existsById(parentId) && itemRepository.getReferenceById(parentId).isFolder()) {
                 item.setParentId(parentId);
             }
@@ -80,10 +81,49 @@ public class ItemService {
 
             // поле size для файлов всегда должно быть больше 0
             // поле size при импорте папки всегда должно быть равно null
+            // При обновлении размера элемента, суммарный размер папки, которая содержит этот элемент, тоже обновляется.
             Integer size = itemImport.getSize();
-            if ((item.isFile() && size > 0) || (item.isFolder() && size == null))
-                item.setSize(size);
-            else
+            if ((item.isFile() && size > 0) || (item.isFolder() && size == null)){
+                Integer prevSize = item.getSize(); // старый размер
+                if (size != null)
+                    item.setSize(size);
+                if (parentId != null && size != null) { // импорт файла
+                    Item parent = itemRepository.getReferenceById(parentId);
+                    Integer parentSize = parent.getSize();
+                    if (parentId.equals(prevParentId)) // если родитель НЕ сменился
+                        parent.setSize(parentSize + size - prevSize); // плюс новый размер минус старый
+                    else if (prevParentId == null) { // если родителя не было
+                        if (parentSize == null) { // если это первый файл в папке
+                            parent.setSize(size);
+                        }else
+                            parent.setSize(parentSize + size);
+                    }
+                    else { // если родитель сменился
+                        Item prevParent = itemRepository.getReferenceById(prevParentId);
+                        Integer prevParentSize = prevParent.getSize();
+                        if (parentSize == null) { // если это первый файл в папке
+                            parent.setSize(size);
+                        }else
+                            parent.setSize(parentSize + size); // к новому плюсуем новый размер
+                        prevParent.setSize(prevParentSize - prevSize); // от старого отнимаем старый размер
+                        itemRepository.save(prevParent);
+                    }
+                    itemRepository.save(parent);
+                }
+                else if (parentId == null && prevParentId != null) { // если родителя больше нет, но он был
+                    Item prevParent = itemRepository.getReferenceById(prevParentId);
+                    Integer prevParentSize = prevParent.getSize();
+                    prevParent.setSize(prevParentSize - prevSize); // отнимаем старый размер у старого родителя
+                    itemRepository.save(prevParent);
+                } else if (parentId != null) { // импорт папки в папку
+                    Item parent = itemRepository.getReferenceById(parentId);
+                    Integer parentSize = parent.getSize();
+                    if (parentSize == null) { // если это первая папка в папке
+                        parent.setSize(prevSize);
+                    }else
+                        parent.setSize(parentSize + prevSize);
+                }
+            }  else
                 throw BAD_REQUEST;
 
             // в одном запросе не может быть двух элементов с одинаковым id
@@ -105,6 +145,17 @@ public class ItemService {
         if (itemRepository.existsById(id)) {
             Item toBeDeleted = itemRepository.getReferenceById(id);
             List<Item> children = toBeDeleted.getChildren();
+            String parentId = toBeDeleted.getParentId();
+            Integer size = toBeDeleted.getSize();
+            Item parent;
+            Integer parentSize;
+            while (parentId != null) {
+                parent = itemRepository.getReferenceById(parentId);
+                parentSize = parent.getSize();
+                parent.setSize(parentSize - size);
+                parentId = parent.getParentId();
+                itemRepository.save(parent);
+            }
             itemRepository.deleteAll(children);
             itemRepository.deleteById(id);
         } else
