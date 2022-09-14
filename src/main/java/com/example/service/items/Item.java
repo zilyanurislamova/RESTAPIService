@@ -1,6 +1,7 @@
 package com.example.service.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -10,16 +11,6 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Item{
-
-    @Override
-    public boolean equals(Object object) {
-        Item other;
-        if (object instanceof Item)
-            other = (Item)object;
-        else
-            return false;
-        return this.id.equals(other.id);
-    }
 
     @Id
     @Column(nullable = false)
@@ -38,7 +29,7 @@ public class Item{
     private String type;
 
     @Column
-    private int size;
+    private Integer size;
 
     @OneToMany(mappedBy = "parentId")
     private List<Item> children;
@@ -59,14 +50,14 @@ public class Item{
         this.type = type.getValue();
     }
 
-    public Item(String id, String url, String date, String parentId, Type type, int size, List<Item> children) {
-        this.id = id;
-        this.url = url;
-        this.date = date;
-        this.parentId = parentId;
-        this.type = type.getValue();
-        this.size = size;
-        this.children = children;
+    @Override
+    public boolean equals(Object object) {
+        Item other;
+        if (object instanceof Item)
+            other = (Item)object;
+        else
+            return false;
+        return this.id.equals(other.id);
     }
 
     public String getId() {
@@ -113,19 +104,19 @@ public class Item{
         this.parentId = parentId;
     }
 
-    public void setType(String type) {
-        if (this.type == null)
-            this.type = type;
-        else if (!this.type.equals(type)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+    public void setType(Type type) {
+        this.type = type.getValue();
     }
 
-    public void setSize(int size) {
+    public void setSize(Integer size) {
         this.size = size;
     }
 
-    public void setChildren(List<Item> children) {
-        this.children = children;
+    public boolean isFolder() {
+        return this.type.equals(Type.FOLDER.getValue());
+    }
+
+    public boolean isFile() {
+        return this.type.equals(Type.FILE.getValue());
     }
 }
