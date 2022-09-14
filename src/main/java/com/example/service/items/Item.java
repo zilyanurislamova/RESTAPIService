@@ -1,6 +1,8 @@
 package com.example.service.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.util.List;
@@ -115,7 +117,7 @@ public class Item{
         if (this.type == null)
             this.type = type;
         else if (!this.type.equals(type)) {
-            throw new RuntimeException("Validation Failed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 
