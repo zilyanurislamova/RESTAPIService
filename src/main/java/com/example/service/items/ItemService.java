@@ -3,6 +3,7 @@ package com.example.service.items;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ItemService {
 
     public void deleteById(String id, String date) {
         try {
-            LocalDateTime.parse(date);
+            LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME);
         }
         catch (DateTimeParseException e) {
             throw new RuntimeException("Validation Failed");
