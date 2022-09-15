@@ -49,6 +49,15 @@ public class Item{
         this.size = size;
     }
 
+    public Item(String id, String url, String date, String parentId, Type type, Integer size) {
+        this.id = id;
+        this.url = url;
+        this.date = date;
+        this.parentId = parentId;
+        this.type = type.getValue();
+        this.size = size;
+    }
+
     public String getId() {
         return id;
     }
