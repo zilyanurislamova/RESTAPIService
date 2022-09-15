@@ -147,12 +147,21 @@ public class ItemService {
                 parentId = parent.getParentId();
                 itemRepository.save(parent);
             }
-            List<Item> children = toBeDeleted.getChildren();
-            if (children != null)
-                itemRepository.deleteAll(children);
-            itemRepository.deleteById(id);
+            deleteItemWithChildren(toBeDeleted);
         } else
             throw NOT_FOUND;
+    }
+
+    private void deleteItemWithChildren(Item item) {
+        List<Item> children = item.getChildren();
+        if (children == null || children.size() == 0) {
+            itemRepository.delete(item);
+            return;
+        }
+        for (Item child: children) {
+            deleteItemWithChildren(child);
+        }
+        itemRepository.delete(item);
     }
 
     public Item getInfoById(String id) {
