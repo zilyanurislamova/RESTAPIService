@@ -128,19 +128,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SystemItem"
-        "400":
-          description: Невалидная схема документа или входные данные не верны.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              examples:
-                response:
-                  value: |-
-                    {
-                      "code": 400,
-                      "message": "Validation Failed"
-                    }
         "404":
           description: Элемент не найден.
           content:
