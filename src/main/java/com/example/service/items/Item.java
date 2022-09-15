@@ -49,16 +49,6 @@ public class Item{
         this.size = size;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        Item other;
-        if (object instanceof Item)
-            other = (Item)object;
-        else
-            return false;
-        return this.id.equals(other.id);
-    }
-
     public String getId() {
         return id;
     }
@@ -114,10 +104,10 @@ public class Item{
     }
 
     public boolean isFolder() {
-        return this.type.equals(Type.FOLDER.getValue());
+        return Type.valueOf(this.type) == Type.FOLDER;
     }
 
     public boolean isFile() {
-        return this.type.equals(Type.FILE.getValue());
+        return Type.valueOf(this.type) == Type.FILE;
     }
 }
