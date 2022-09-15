@@ -84,6 +84,8 @@ public class Item{
     }
 
     public List<Item> getChildren() {
+        if (this.isFile())
+            return null;
         return children;
     }
 

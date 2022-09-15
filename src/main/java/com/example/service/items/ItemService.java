@@ -129,7 +129,6 @@ public class ItemService {
 
         if (itemRepository.existsById(id)) {
             Item toBeDeleted = itemRepository.getReferenceById(id);
-            List<Item> children = toBeDeleted.getChildren();
             String parentId = toBeDeleted.getParentId();
             Integer size = toBeDeleted.getSize();
             Item parent;
@@ -141,7 +140,9 @@ public class ItemService {
                 parentId = parent.getParentId();
                 itemRepository.save(parent);
             }
-            itemRepository.deleteAll(children);
+            List<Item> children = toBeDeleted.getChildren();
+            if (children != null)
+                itemRepository.deleteAll(children);
             itemRepository.deleteById(id);
         } else
             throw NOT_FOUND;
