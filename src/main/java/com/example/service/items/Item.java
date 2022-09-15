@@ -1,15 +1,12 @@
 package com.example.service.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "file", "folder"})
 public class Item{
 
     @Id
@@ -37,27 +34,19 @@ public class Item{
     public Item() {
     }
 
-    public Item(String id, String date, Type type) {
+    public Item(String id, String date, Type type, Integer size) {
         this.id = id;
         this.date = date;
         this.type = type.getValue();
+        this.size = size;
     }
 
-    public Item(String id, String date, String parentId, Type type) {
+    public Item(String id, String date, String parentId, Type type, Integer size) {
         this.id = id;
         this.date = date;
         this.parentId = parentId;
         this.type = type.getValue();
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        Item other;
-        if (object instanceof Item)
-            other = (Item)object;
-        else
-            return false;
-        return this.id.equals(other.id);
+        this.size = size;
     }
 
     public String getId() {
@@ -80,11 +69,13 @@ public class Item{
         return type;
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 
     public List<Item> getChildren() {
+        if (this.isFile())
+            return null;
         return children;
     }
 
@@ -113,10 +104,10 @@ public class Item{
     }
 
     public boolean isFolder() {
-        return this.type.equals(Type.FOLDER.getValue());
+        return Type.valueOf(this.type) == Type.FOLDER;
     }
 
     public boolean isFile() {
-        return this.type.equals(Type.FILE.getValue());
+        return Type.valueOf(this.type) == Type.FILE;
     }
 }
